@@ -1,7 +1,27 @@
 version: '3.8'
 services:
+
+  gateway:
+    build:
+      context: .
+      dockerfile: apps/gateway/Dockerfile
+      target: development
+    command: npm run start:dev gateway
+    env_file:
+      - ./apps/gateway/.env
+    volumes:
+      - .:/app
+      - /app/node_modules
+    container_name: gateway
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+    networks:
+      - app-network
+
   postgres:
-    image: postgres:14
+    image: postgres:15
     container_name: postgres-db
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
@@ -9,8 +29,10 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
+    expose:
+      - 5432
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - ./db:/var/lib/postgresql/data
     networks:
       - app-network
 
@@ -30,6 +52,3 @@ services:
 networks:
   app-network:
     driver: bridge
-
-volumes:
-  postgres_data:
