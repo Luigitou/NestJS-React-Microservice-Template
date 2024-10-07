@@ -18,17 +18,26 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var _a;
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a, _b, _c;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GatewayController = void 0;
 const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
 const gateway_service_1 = __webpack_require__(/*! ./gateway.service */ "./apps/gateway/src/gateway.service.ts");
+const microservices_1 = __webpack_require__(/*! @nestjs/microservices */ "@nestjs/microservices");
+const rxjs_1 = __webpack_require__(/*! rxjs */ "rxjs");
 let GatewayController = class GatewayController {
-    constructor(gatewayService) {
+    constructor(gatewayService, authService) {
         this.gatewayService = gatewayService;
+        this.authService = authService;
     }
     getHello() {
         return this.gatewayService.getHello();
+    }
+    getAuth() {
+        return this.authService.send({ cmd: 'hello-auth' }, '');
     }
 };
 exports.GatewayController = GatewayController;
@@ -38,9 +47,16 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", String)
 ], GatewayController.prototype, "getHello", null);
+__decorate([
+    (0, common_1.Get)('auth'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", typeof (_c = typeof rxjs_1.Observable !== "undefined" && rxjs_1.Observable) === "function" ? _c : Object)
+], GatewayController.prototype, "getAuth", null);
 exports.GatewayController = GatewayController = __decorate([
     (0, common_1.Controller)(),
-    __metadata("design:paramtypes", [typeof (_a = typeof gateway_service_1.GatewayService !== "undefined" && gateway_service_1.GatewayService) === "function" ? _a : Object])
+    __param(1, (0, common_1.Inject)('AUTH_SERVICE')),
+    __metadata("design:paramtypes", [typeof (_a = typeof gateway_service_1.GatewayService !== "undefined" && gateway_service_1.GatewayService) === "function" ? _a : Object, typeof (_b = typeof microservices_1.ClientProxy !== "undefined" && microservices_1.ClientProxy) === "function" ? _b : Object])
 ], GatewayController);
 
 
@@ -66,6 +82,7 @@ const gateway_controller_1 = __webpack_require__(/*! ./gateway.controller */ "./
 const gateway_service_1 = __webpack_require__(/*! ./gateway.service */ "./apps/gateway/src/gateway.service.ts");
 const config_1 = __webpack_require__(/*! @nestjs/config */ "@nestjs/config");
 const Joi = __webpack_require__(/*! joi */ "joi");
+const microservices_1 = __webpack_require__(/*! @nestjs/microservices */ "@nestjs/microservices");
 let GatewayModule = class GatewayModule {
 };
 exports.GatewayModule = GatewayModule;
@@ -75,10 +92,20 @@ exports.GatewayModule = GatewayModule = __decorate([
             config_1.ConfigModule.forRoot({
                 isGlobal: true,
                 validationSchema: Joi.object({
-                    PORT: Joi.number().default(3000),
+                    PORT: Joi.number().default(5173),
                 }),
                 envFilePath: ['.env.local', '.env'],
             }),
+            microservices_1.ClientsModule.register([
+                {
+                    name: 'AUTH_SERVICE',
+                    transport: microservices_1.Transport.TCP,
+                    options: {
+                        host: 'auth',
+                        port: 5001,
+                    },
+                },
+            ]),
         ],
         controllers: [gateway_controller_1.GatewayController],
         providers: [gateway_service_1.GatewayService],
@@ -147,6 +174,16 @@ module.exports = require("@nestjs/core");
 
 /***/ }),
 
+/***/ "@nestjs/microservices":
+/*!****************************************!*\
+  !*** external "@nestjs/microservices" ***!
+  \****************************************/
+/***/ ((module) => {
+
+module.exports = require("@nestjs/microservices");
+
+/***/ }),
+
 /***/ "joi":
 /*!**********************!*\
   !*** external "joi" ***!
@@ -154,6 +191,16 @@ module.exports = require("@nestjs/core");
 /***/ ((module) => {
 
 module.exports = require("joi");
+
+/***/ }),
+
+/***/ "rxjs":
+/*!***********************!*\
+  !*** external "rxjs" ***!
+  \***********************/
+/***/ ((module) => {
+
+module.exports = require("rxjs");
 
 /***/ })
 
@@ -197,7 +244,7 @@ const core_1 = __webpack_require__(/*! @nestjs/core */ "@nestjs/core");
 const gateway_module_1 = __webpack_require__(/*! ./gateway.module */ "./apps/gateway/src/gateway.module.ts");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(gateway_module_1.GatewayModule);
-    await app.listen(5173);
+    await app.listen(5000);
 }
 bootstrap();
 

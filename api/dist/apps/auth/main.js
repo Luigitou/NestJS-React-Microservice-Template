@@ -23,21 +23,23 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AuthController = void 0;
 const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
 const auth_service_1 = __webpack_require__(/*! ./auth.service */ "./apps/auth/src/auth.service.ts");
+const microservices_1 = __webpack_require__(/*! @nestjs/microservices */ "@nestjs/microservices");
 let AuthController = class AuthController {
     constructor(authService) {
         this.authService = authService;
     }
-    getHello() {
+    helloAuth(data) {
+        console.log(data);
         return this.authService.getHello();
     }
 };
 exports.AuthController = AuthController;
 __decorate([
-    (0, common_1.Get)(),
+    (0, microservices_1.MessagePattern)({ cmd: 'hello-auth' }),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", String)
-], AuthController.prototype, "getHello", null);
+], AuthController.prototype, "helloAuth", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)(),
     __metadata("design:paramtypes", [typeof (_a = typeof auth_service_1.AuthService !== "undefined" && auth_service_1.AuthService) === "function" ? _a : Object])
@@ -96,7 +98,7 @@ exports.AuthService = void 0;
 const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
 let AuthService = class AuthService {
     getHello() {
-        return 'Hello World!';
+        return 'Hello auth!';
     }
 };
 exports.AuthService = AuthService;
@@ -124,6 +126,16 @@ module.exports = require("@nestjs/common");
 /***/ ((module) => {
 
 module.exports = require("@nestjs/core");
+
+/***/ }),
+
+/***/ "@nestjs/microservices":
+/*!****************************************!*\
+  !*** external "@nestjs/microservices" ***!
+  \****************************************/
+/***/ ((module) => {
+
+module.exports = require("@nestjs/microservices");
 
 /***/ })
 
@@ -165,9 +177,16 @@ var exports = __webpack_exports__;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core_1 = __webpack_require__(/*! @nestjs/core */ "@nestjs/core");
 const auth_module_1 = __webpack_require__(/*! ./auth.module */ "./apps/auth/src/auth.module.ts");
+const microservices_1 = __webpack_require__(/*! @nestjs/microservices */ "@nestjs/microservices");
 async function bootstrap() {
-    const app = await core_1.NestFactory.create(auth_module_1.AuthModule);
-    await app.listen(3000);
+    const app = await core_1.NestFactory.createMicroservice(auth_module_1.AuthModule, {
+        transport: microservices_1.Transport.TCP,
+        options: {
+            host: '0.0.0.0',
+            port: 5001,
+        },
+    });
+    await app.listen();
 }
 bootstrap();
 

@@ -28,7 +28,24 @@ services:
       - /app/node_modules
     container_name: gateway
     ports:
-      - "5173:5173"
+      - "5000:5000"
+    depends_on:
+      - auth
+    networks:
+      - app-network
+
+  auth:
+    build:
+      context: api
+      dockerfile: ./apps/auth/Dockerfile
+      target: development
+    command: npm run start:dev auth
+    env_file:
+      - api/apps/auth/.env
+    volumes:
+      - ./api:/app
+      - /app/node_modules
+    container_name: auth
     depends_on:
       - postgres
     networks:
