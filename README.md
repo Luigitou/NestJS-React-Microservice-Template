@@ -1,7 +1,8 @@
+# NestJS React Microservice Template
 
-# Kusodu-micro
-
-Kusodu-micro is a template project that combines a microservice architecture using NestJS with a frontend in React. It leverages Docker to containerize services and PostgreSQL as the database. This template is designed to be scalable, easy to maintain, and adaptable to various applications.
+This is a template project that combines a microservice architecture using NestJS with a frontend in React. It leverages
+Docker to containerize services and PostgreSQL as the database. This template is designed to be scalable, easy to
+maintain, and adaptable to various applications.
 
 ## Features
 
@@ -69,8 +70,10 @@ This will set up and run all the services, including PostgreSQL, pgAdmin, and th
 
 ### 4. Access the services
 
-- **React App**: Open your browser and navigate to `http://localhost:<React_App_Port>` (usually specified in your React app config).
-- **pgAdmin**: Access pgAdmin at `http://localhost:5050` and log in using the email and password you specified in the `.env` file.
+- **React App**: Open your browser and navigate to `http://localhost:<React_App_Port>` (usually specified in your React
+  app config).
+- **pgAdmin**: Access pgAdmin at `http://localhost:5050` and log in using the email and password you specified in the
+  `.env` file.
 - **API Gateway**: Interact with the API through the gateway at `http://localhost:<Gateway_Port>`.
 - **Auth Service**: Access the authentication microservice at `http://localhost:<Auth_Port>`.
 
