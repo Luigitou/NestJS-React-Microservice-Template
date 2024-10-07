@@ -197,7 +197,7 @@ const core_1 = __webpack_require__(/*! @nestjs/core */ "@nestjs/core");
 const gateway_module_1 = __webpack_require__(/*! ./gateway.module */ "./apps/gateway/src/gateway.module.ts");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(gateway_module_1.GatewayModule);
-    await app.listen(3000);
+    await app.listen(5173);
 }
 bootstrap();
 

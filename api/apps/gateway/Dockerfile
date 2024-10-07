@@ -23,6 +23,6 @@ RUN npm install --only=production
 
 COPY . .
 
-COPY --from=Development /app/dist ./dist
+COPY --from=development /app/dist ./dist
 
 CMD ["node", "dist/apps/gateway/main.js"]
