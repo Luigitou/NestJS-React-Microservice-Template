@@ -5,10 +5,8 @@ services:
       context: client
       dockerfile: ./Dockerfile
       target: development
-
     volumes:
       - ./client:/app
-      - /app/node_modules
     container_name: client
     ports:
       - "3000:3000"
@@ -22,15 +20,16 @@ services:
       target: development
     command: npm run start:dev gateway
     env_file:
-      - api/apps/gateway/.env
+      - ./api/apps/gateway/.env
+      - api/prisma/.env
     volumes:
       - ./api:/app
-      - /app/node_modules
     container_name: gateway
     ports:
       - "5000:5000"
     depends_on:
       - auth
+      - postgres
     networks:
       - app-network
 
@@ -44,7 +43,6 @@ services:
       - api/apps/auth/.env
     volumes:
       - ./api:/app
-      - /app/node_modules
     container_name: auth
     depends_on:
       - postgres
@@ -79,6 +77,8 @@ services:
       - postgres
     networks:
       - app-network
+    volumes:
+      - ./pgadmin_data:/var/lib/pgadmin:rw
 
 networks:
   app-network:
