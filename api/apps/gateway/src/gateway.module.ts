@@ -10,7 +10,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: Joi.object({
-        PORT: Joi.number().default(5173),
+        PORT: Joi.number().default(5000),
       }),
       envFilePath: ['.env.local', '.env'],
     }),
@@ -28,5 +28,4 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
   controllers: [GatewayController],
   providers: [GatewayService],
 })
-export class GatewayModule {
-}
+export class GatewayModule {}

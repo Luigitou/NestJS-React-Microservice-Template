@@ -92,7 +92,7 @@ exports.GatewayModule = GatewayModule = __decorate([
             config_1.ConfigModule.forRoot({
                 isGlobal: true,
                 validationSchema: Joi.object({
-                    PORT: Joi.number().default(5173),
+                    PORT: Joi.number().default(5000),
                 }),
                 envFilePath: ['.env.local', '.env'],
             }),
@@ -212,6 +212,16 @@ module.exports = require("joi");
 
 module.exports = require("rxjs");
 
+/***/ }),
+
+/***/ "node:process":
+/*!*******************************!*\
+  !*** external "node:process" ***!
+  \*******************************/
+/***/ ((module) => {
+
+module.exports = require("node:process");
+
 /***/ })
 
 /******/ 	});
@@ -253,6 +263,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core_1 = __webpack_require__(/*! @nestjs/core */ "@nestjs/core");
 const gateway_module_1 = __webpack_require__(/*! ./gateway.module */ "./apps/gateway/src/gateway.module.ts");
 const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+const process = __webpack_require__(/*! node:process */ "node:process");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(gateway_module_1.GatewayModule);
     const config = new swagger_1.DocumentBuilder()
@@ -262,7 +273,7 @@ async function bootstrap() {
         .build();
     const document = swagger_1.SwaggerModule.createDocument(app, config);
     swagger_1.SwaggerModule.setup('api', app, document);
-    await app.listen(5000);
+    await app.listen(process.env.PORT);
 }
 bootstrap();
 
