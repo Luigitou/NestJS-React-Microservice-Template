@@ -10,6 +10,7 @@ export class GatewayController {
   constructor(
     private readonly gatewayService: GatewayService,
     @Inject('AUTH_SERVICE') private readonly authService: ClientProxy,
+    @Inject('USER_SERVICE') private readonly userService: ClientProxy,
     private readonly logger: LoggerService,
   ) {}
 
@@ -22,6 +23,11 @@ export class GatewayController {
   @Get('auth')
   getAuth(): Observable<string> {
     return this.authService.send({ cmd: 'hello-auth' }, '');
+  }
+
+  @Get('user')
+  getUser(): Observable<string> {
+    return this.userService.send({ cmd: 'hello-user' }, '');
   }
 
   @Post('role')

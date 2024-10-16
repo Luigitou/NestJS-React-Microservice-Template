@@ -27,6 +27,14 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
           port: 5001,
         },
       },
+      {
+        name: 'USER_SERVICE',
+        transport: Transport.TCP,
+        options: {
+          host: 'user',
+          port: 5002,
+        },
+      },
     ]),
   ],
   controllers: [GatewayController],

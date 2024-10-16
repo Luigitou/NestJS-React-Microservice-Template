@@ -33,6 +33,22 @@ services:
     networks:
       - app-network
 
+  user:
+    build:
+      context: api
+      dockerfile: ./apps/user/Dockerfile
+      target: development
+    command: npm run start:dev user
+    env_file:
+      - api/apps/user/.env
+    volumes:
+      - ./api:/app
+    container_name: user
+    depends_on:
+      - postgres
+    networks:
+      - app-network
+
   auth:
     build:
       context: api
