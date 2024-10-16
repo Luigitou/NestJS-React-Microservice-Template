@@ -21,7 +21,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var _a, _b, _c;
+var _a, _b, _c, _d, _e;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GatewayController = void 0;
 const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
@@ -39,6 +39,12 @@ let GatewayController = class GatewayController {
     getAuth() {
         return this.authService.send({ cmd: 'hello-auth' }, '');
     }
+    async createRole(body) {
+        return this.gatewayService.createRole(body.name, body.description);
+    }
+    async getRoles() {
+        return this.gatewayService.getAllRoles();
+    }
 };
 exports.GatewayController = GatewayController;
 __decorate([
@@ -53,6 +59,19 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", typeof (_c = typeof rxjs_1.Observable !== "undefined" && rxjs_1.Observable) === "function" ? _c : Object)
 ], GatewayController.prototype, "getAuth", null);
+__decorate([
+    (0, common_1.Post)('role'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", typeof (_d = typeof Promise !== "undefined" && Promise) === "function" ? _d : Object)
+], GatewayController.prototype, "createRole", null);
+__decorate([
+    (0, common_1.Get)('role'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", typeof (_e = typeof Promise !== "undefined" && Promise) === "function" ? _e : Object)
+], GatewayController.prototype, "getRoles", null);
 exports.GatewayController = GatewayController = __decorate([
     (0, common_1.Controller)(),
     __param(1, (0, common_1.Inject)('AUTH_SERVICE')),
@@ -83,6 +102,7 @@ const gateway_service_1 = __webpack_require__(/*! ./gateway.service */ "./apps/g
 const config_1 = __webpack_require__(/*! @nestjs/config */ "@nestjs/config");
 const Joi = __webpack_require__(/*! joi */ "joi");
 const microservices_1 = __webpack_require__(/*! @nestjs/microservices */ "@nestjs/microservices");
+const prisma_service_1 = __webpack_require__(/*! @app/libs/prisma/prisma.service */ "./libs/prisma/prisma.service.ts");
 let GatewayModule = class GatewayModule {
 };
 exports.GatewayModule = GatewayModule;
@@ -108,7 +128,7 @@ exports.GatewayModule = GatewayModule = __decorate([
             ]),
         ],
         controllers: [gateway_controller_1.GatewayController],
-        providers: [gateway_service_1.GatewayService],
+        providers: [gateway_service_1.GatewayService, prisma_service_1.PrismaService],
     })
 ], GatewayModule);
 
@@ -128,18 +148,71 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GatewayService = void 0;
 const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const prisma_service_1 = __webpack_require__(/*! @app/libs/prisma/prisma.service */ "./libs/prisma/prisma.service.ts");
 let GatewayService = class GatewayService {
+    constructor(prisma) {
+        this.prisma = prisma;
+    }
     getHello() {
         return 'Hello World!';
+    }
+    async createRole(name, description) {
+        return this.prisma.role.create({
+            data: {
+                name,
+                description,
+            },
+        });
+    }
+    async getAllRoles() {
+        return this.prisma.role.findMany();
     }
 };
 exports.GatewayService = GatewayService;
 exports.GatewayService = GatewayService = __decorate([
-    (0, common_1.Injectable)()
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object])
 ], GatewayService);
+
+
+/***/ }),
+
+/***/ "./libs/prisma/prisma.service.ts":
+/*!***************************************!*\
+  !*** ./libs/prisma/prisma.service.ts ***!
+  \***************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PrismaService = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const client_1 = __webpack_require__(/*! @prisma/client */ "@prisma/client");
+let PrismaService = class PrismaService extends client_1.PrismaClient {
+    async onModuleInit() {
+        await this.$connect();
+    }
+    async onModuleDestroy() {
+        await this.$disconnect();
+    }
+};
+exports.PrismaService = PrismaService;
+exports.PrismaService = PrismaService = __decorate([
+    (0, common_1.Injectable)()
+], PrismaService);
 
 
 /***/ }),
@@ -191,6 +264,16 @@ module.exports = require("@nestjs/microservices");
 /***/ ((module) => {
 
 module.exports = require("@nestjs/swagger");
+
+/***/ }),
+
+/***/ "@prisma/client":
+/*!*********************************!*\
+  !*** external "@prisma/client" ***!
+  \*********************************/
+/***/ ((module) => {
+
+module.exports = require("@prisma/client");
 
 /***/ }),
 

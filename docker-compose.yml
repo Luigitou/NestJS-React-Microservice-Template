@@ -18,7 +18,7 @@ services:
       context: api
       dockerfile: ./apps/gateway/Dockerfile
       target: development
-    command: npm run start:dev gateway
+    command: npm run start:dev:seed gateway
     env_file:
       - ./api/apps/gateway/.env
       - api/prisma/.env

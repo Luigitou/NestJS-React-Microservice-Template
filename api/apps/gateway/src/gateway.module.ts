@@ -4,6 +4,7 @@ import { GatewayService } from './gateway.service';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { PrismaService } from '@app/libs/prisma/prisma.service';
 
 @Module({
   imports: [
@@ -26,6 +27,6 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
     ]),
   ],
   controllers: [GatewayController],
-  providers: [GatewayService],
+  providers: [GatewayService, PrismaService],
 })
 export class GatewayModule {}
