@@ -4,12 +4,10 @@ import { MessagePattern } from '@nestjs/microservices';
 
 @Controller()
 export class AuthController {
-  constructor(private readonly authService: AuthService) {
-  }
+  constructor(private readonly authService: AuthService) {}
 
   @MessagePattern({ cmd: 'hello-auth' })
-  helloAuth(data: any): string {
-    console.log(data);
+  helloAuth(): string {
     return this.authService.getHello();
   }
 }

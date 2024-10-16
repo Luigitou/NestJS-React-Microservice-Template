@@ -28,8 +28,7 @@ let AuthController = class AuthController {
     constructor(authService) {
         this.authService = authService;
     }
-    helloAuth(data) {
-        console.log(data);
+    helloAuth() {
         return this.authService.getHello();
     }
 };
@@ -37,7 +36,7 @@ exports.AuthController = AuthController;
 __decorate([
     (0, microservices_1.MessagePattern)({ cmd: 'hello-auth' }),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", []),
     __metadata("design:returntype", String)
 ], AuthController.prototype, "helloAuth", null);
 exports.AuthController = AuthController = __decorate([

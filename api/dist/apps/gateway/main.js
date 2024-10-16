@@ -21,19 +21,22 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var _a, _b, _c, _d, _e;
+var _a, _b, _c, _d, _e, _f;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GatewayController = void 0;
 const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
 const gateway_service_1 = __webpack_require__(/*! ./gateway.service */ "./apps/gateway/src/gateway.service.ts");
 const microservices_1 = __webpack_require__(/*! @nestjs/microservices */ "@nestjs/microservices");
 const rxjs_1 = __webpack_require__(/*! rxjs */ "rxjs");
+const logger_service_1 = __webpack_require__(/*! @app/libs/logger/logger.service */ "./libs/logger/logger.service.ts");
 let GatewayController = class GatewayController {
-    constructor(gatewayService, authService) {
+    constructor(gatewayService, authService, logger) {
         this.gatewayService = gatewayService;
         this.authService = authService;
+        this.logger = logger;
     }
     getHello() {
+        this.logger.log('Hello World from the logs!');
         return this.gatewayService.getHello();
     }
     getAuth() {
@@ -57,25 +60,25 @@ __decorate([
     (0, common_1.Get)('auth'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
-    __metadata("design:returntype", typeof (_c = typeof rxjs_1.Observable !== "undefined" && rxjs_1.Observable) === "function" ? _c : Object)
+    __metadata("design:returntype", typeof (_d = typeof rxjs_1.Observable !== "undefined" && rxjs_1.Observable) === "function" ? _d : Object)
 ], GatewayController.prototype, "getAuth", null);
 __decorate([
     (0, common_1.Post)('role'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", typeof (_d = typeof Promise !== "undefined" && Promise) === "function" ? _d : Object)
+    __metadata("design:returntype", typeof (_e = typeof Promise !== "undefined" && Promise) === "function" ? _e : Object)
 ], GatewayController.prototype, "createRole", null);
 __decorate([
     (0, common_1.Get)('role'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
-    __metadata("design:returntype", typeof (_e = typeof Promise !== "undefined" && Promise) === "function" ? _e : Object)
+    __metadata("design:returntype", typeof (_f = typeof Promise !== "undefined" && Promise) === "function" ? _f : Object)
 ], GatewayController.prototype, "getRoles", null);
 exports.GatewayController = GatewayController = __decorate([
     (0, common_1.Controller)(),
     __param(1, (0, common_1.Inject)('AUTH_SERVICE')),
-    __metadata("design:paramtypes", [typeof (_a = typeof gateway_service_1.GatewayService !== "undefined" && gateway_service_1.GatewayService) === "function" ? _a : Object, typeof (_b = typeof microservices_1.ClientProxy !== "undefined" && microservices_1.ClientProxy) === "function" ? _b : Object])
+    __metadata("design:paramtypes", [typeof (_a = typeof gateway_service_1.GatewayService !== "undefined" && gateway_service_1.GatewayService) === "function" ? _a : Object, typeof (_b = typeof microservices_1.ClientProxy !== "undefined" && microservices_1.ClientProxy) === "function" ? _b : Object, typeof (_c = typeof logger_service_1.LoggerService !== "undefined" && logger_service_1.LoggerService) === "function" ? _c : Object])
 ], GatewayController);
 
 
@@ -103,6 +106,9 @@ const config_1 = __webpack_require__(/*! @nestjs/config */ "@nestjs/config");
 const Joi = __webpack_require__(/*! joi */ "joi");
 const microservices_1 = __webpack_require__(/*! @nestjs/microservices */ "@nestjs/microservices");
 const prisma_service_1 = __webpack_require__(/*! @app/libs/prisma/prisma.service */ "./libs/prisma/prisma.service.ts");
+const logger_service_1 = __webpack_require__(/*! @app/libs/logger/logger.service */ "./libs/logger/logger.service.ts");
+const logger_interceptor_1 = __webpack_require__(/*! @app/libs/logger/logger.interceptor */ "./libs/logger/logger.interceptor.ts");
+const core_1 = __webpack_require__(/*! @nestjs/core */ "@nestjs/core");
 let GatewayModule = class GatewayModule {
 };
 exports.GatewayModule = GatewayModule;
@@ -128,7 +134,16 @@ exports.GatewayModule = GatewayModule = __decorate([
             ]),
         ],
         controllers: [gateway_controller_1.GatewayController],
-        providers: [gateway_service_1.GatewayService, prisma_service_1.PrismaService],
+        providers: [
+            gateway_service_1.GatewayService,
+            prisma_service_1.PrismaService,
+            logger_service_1.LoggerService,
+            {
+                provide: core_1.APP_INTERCEPTOR,
+                useClass: logger_interceptor_1.LoggerInterceptor,
+            },
+        ],
+        exports: [prisma_service_1.PrismaService, logger_service_1.LoggerService],
     })
 ], GatewayModule);
 
@@ -180,6 +195,94 @@ exports.GatewayService = GatewayService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object])
 ], GatewayService);
+
+
+/***/ }),
+
+/***/ "./libs/logger/logger.interceptor.ts":
+/*!*******************************************!*\
+  !*** ./libs/logger/logger.interceptor.ts ***!
+  \*******************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.LoggerInterceptor = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const logger_service_1 = __webpack_require__(/*! @app/libs/logger/logger.service */ "./libs/logger/logger.service.ts");
+const rxjs_1 = __webpack_require__(/*! rxjs */ "rxjs");
+let LoggerInterceptor = class LoggerInterceptor {
+    constructor(logger) {
+        this.logger = logger;
+    }
+    intercept(context, next) {
+        const ctx = context.switchToHttp();
+        const request = ctx.getRequest();
+        const response = ctx.getResponse();
+        const { method, originalUrl } = request;
+        const startTime = Date.now();
+        return next.handle().pipe((0, rxjs_1.tap)(() => {
+            const statusCode = response.statusCode;
+            const duration = Date.now() - startTime;
+            if (statusCode >= 200 && statusCode < 300) {
+                this.logger.log(`${method} ${originalUrl} - Status: ${statusCode} - Duration: ${duration}ms`, 'HTTP');
+            }
+        }), (0, rxjs_1.catchError)((error) => {
+            const statusCode = response.statusCode;
+            const duration = Date.now() - startTime;
+            this.logger.error(`${method} ${originalUrl} - Status: ${statusCode} - Duration: ${duration}ms - Error: ${error}`, error.stack, 'HTTP');
+            throw error;
+        }));
+    }
+};
+exports.LoggerInterceptor = LoggerInterceptor;
+exports.LoggerInterceptor = LoggerInterceptor = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [typeof (_a = typeof logger_service_1.LoggerService !== "undefined" && logger_service_1.LoggerService) === "function" ? _a : Object])
+], LoggerInterceptor);
+
+
+/***/ }),
+
+/***/ "./libs/logger/logger.service.ts":
+/*!***************************************!*\
+  !*** ./libs/logger/logger.service.ts ***!
+  \***************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.LoggerService = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+let LoggerService = class LoggerService extends common_1.Logger {
+    constructor() {
+        super();
+    }
+};
+exports.LoggerService = LoggerService;
+exports.LoggerService = LoggerService = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [])
+], LoggerService);
 
 
 /***/ }),

@@ -5,6 +5,9 @@ import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { PrismaService } from '@app/libs/prisma/prisma.service';
+import { LoggerService } from '@app/libs/logger/logger.service';
+import { LoggerInterceptor } from '@app/libs/logger/logger.interceptor';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -27,6 +30,15 @@ import { PrismaService } from '@app/libs/prisma/prisma.service';
     ]),
   ],
   controllers: [GatewayController],
-  providers: [GatewayService, PrismaService],
+  providers: [
+    GatewayService,
+    PrismaService,
+    LoggerService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggerInterceptor,
+    },
+  ],
+  exports: [PrismaService, LoggerService],
 })
 export class GatewayModule {}

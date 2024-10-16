@@ -3,16 +3,19 @@ import { GatewayService } from './gateway.service';
 import { ClientProxy } from '@nestjs/microservices';
 import { Observable } from 'rxjs';
 import { Role } from '@prisma/client';
+import { LoggerService } from '@app/libs/logger/logger.service';
 
 @Controller()
 export class GatewayController {
   constructor(
     private readonly gatewayService: GatewayService,
     @Inject('AUTH_SERVICE') private readonly authService: ClientProxy,
+    private readonly logger: LoggerService,
   ) {}
 
   @Get()
   getHello(): string {
+    this.logger.log('Hello World from the logs!');
     return this.gatewayService.getHello();
   }
 
