@@ -3,11 +3,12 @@ import { GatewayController } from './gateway.controller';
 import { GatewayService } from './gateway.service';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
-import { ClientsModule, Transport } from '@nestjs/microservices';
 import { PrismaService } from '@app/libs/prisma/prisma.service';
 import { LoggerService } from '@app/libs/logger/logger.service';
 import { LoggerInterceptor } from '@app/libs/logger/logger.interceptor';
 import { APP_INTERCEPTOR } from '@nestjs/core';
+import { microservicesConfig } from '@app/libs/config/microservices/microservices.config';
+import { ClientsModule } from '@nestjs/microservices';
 
 @Module({
   imports: [
@@ -18,24 +19,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
       }),
       envFilePath: ['.env.local', '.env'],
     }),
-    ClientsModule.register([
-      {
-        name: 'AUTH_SERVICE',
-        transport: Transport.TCP,
-        options: {
-          host: 'auth',
-          port: 5001,
-        },
-      },
-      {
-        name: 'USER_SERVICE',
-        transport: Transport.TCP,
-        options: {
-          host: 'user',
-          port: 5002,
-        },
-      },
-    ]),
+    ClientsModule.register(microservicesConfig),
   ],
   controllers: [GatewayController],
   providers: [

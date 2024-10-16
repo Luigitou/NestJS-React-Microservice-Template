@@ -30,6 +30,11 @@ export class GatewayController {
     return this.userService.send({ cmd: 'hello-user' }, '');
   }
 
+  @Get('call/user')
+  callUser(): Observable<string> {
+    return this.authService.send({ cmd: 'call-user' }, '');
+  }
+
   @Post('role')
   async createRole(
     @Body() body: { name: string; description: string },
