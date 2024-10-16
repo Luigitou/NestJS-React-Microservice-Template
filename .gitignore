@@ -6,3 +6,5 @@
 **/.env.local
 **/db
 **/pgadmin_data
+**/coverage
+**/dist
