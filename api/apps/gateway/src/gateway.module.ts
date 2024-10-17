@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { GatewayController } from './gateway.controller';
 import { GatewayService } from './gateway.service';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
@@ -9,6 +8,8 @@ import { LoggerInterceptor } from '@app/libs/logger/logger.interceptor';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { microservicesConfig } from '@app/libs/config/microservices/microservices.config';
 import { ClientsModule } from '@nestjs/microservices';
+import { PingController } from './controllers/ping.controller';
+import { AuthenticationController } from './controllers/authentication.controller';
 
 @Module({
   imports: [
@@ -21,7 +22,7 @@ import { ClientsModule } from '@nestjs/microservices';
     }),
     ClientsModule.register(microservicesConfig),
   ],
-  controllers: [GatewayController],
+  controllers: [AuthenticationController, PingController],
   providers: [
     GatewayService,
     PrismaService,

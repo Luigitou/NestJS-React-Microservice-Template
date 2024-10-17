@@ -1,6 +1,7 @@
 import { Controller } from '@nestjs/common';
 import { UserService } from './user.service';
 import { MessagePattern } from '@nestjs/microservices';
+import { User } from '@prisma/client';
 
 @Controller()
 export class UserController {
@@ -9,5 +10,10 @@ export class UserController {
   @MessagePattern({ cmd: 'hello-user' })
   getHello(): string {
     return this.userService.getHello();
+  }
+
+  @MessagePattern({ cmd: 'find-one-user' })
+  async findOneUser(data: { email: string }): Promise<User> {
+    return this.userService.findOneUser(data);
   }
 }

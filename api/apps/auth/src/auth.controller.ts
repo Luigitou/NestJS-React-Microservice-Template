@@ -19,4 +19,18 @@ export class AuthController {
   callUser(): Observable<string> {
     return this.userService.send({ cmd: 'hello-user' }, '');
   }
+
+  @MessagePattern({ cmd: 'register' })
+  async register(data: { email: string; name: string; password: string }) {
+    return this.authService.register(data);
+  }
+
+  @MessagePattern({ cmd: 'authenticate' })
+  async authenticate(data: { username: string; password: string }): Promise<{
+    accessToken: string;
+    username: string;
+    userId: string;
+  }> {
+    return this.authService.authenticate(data);
+  }
 }

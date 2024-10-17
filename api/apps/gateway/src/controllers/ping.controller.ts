@@ -1,12 +1,13 @@
-import { Body, Controller, Get, Inject, Post } from '@nestjs/common';
-import { GatewayService } from './gateway.service';
+import { ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Inject } from '@nestjs/common';
+import { GatewayService } from '../gateway.service';
 import { ClientProxy } from '@nestjs/microservices';
-import { Observable } from 'rxjs';
-import { Role } from '@prisma/client';
 import { LoggerService } from '@app/libs/logger/logger.service';
+import { Observable } from 'rxjs';
 
 @Controller()
-export class GatewayController {
+@ApiTags('Ping')
+export class PingController {
   constructor(
     private readonly gatewayService: GatewayService,
     @Inject('AUTH_SERVICE') private readonly authService: ClientProxy,
@@ -33,17 +34,5 @@ export class GatewayController {
   @Get('call/user')
   callUser(): Observable<string> {
     return this.authService.send({ cmd: 'call-user' }, '');
-  }
-
-  @Post('role')
-  async createRole(
-    @Body() body: { name: string; description: string },
-  ): Promise<Role> {
-    return this.gatewayService.createRole(body.name, body.description);
-  }
-
-  @Get('role')
-  async getRoles(): Promise<any> {
-    return this.gatewayService.getAllRoles();
   }
 }
