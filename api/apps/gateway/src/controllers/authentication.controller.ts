@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Inject, Post } from '@nestjs/common';
+import { Body, Controller, Inject, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { GatewayService } from '../gateway.service';
 import { ClientProxy } from '@nestjs/microservices';
@@ -22,7 +22,7 @@ export class AuthenticationController {
     return this.authService.send({ cmd: 'register' }, data);
   }
 
-  @Get('auth/login')
+  @Post('auth/login')
   async getAuthToken(
     @Body() data: { username: string; password: string },
   ): Promise<
@@ -32,6 +32,9 @@ export class AuthenticationController {
       userId: string;
     }>
   > {
-    return this.authService.send({ cmd: 'login' }, data);
+    return this.authService.send(
+      { cmd: 'login' },
+      { username: data.username, password: data.password },
+    );
   }
 }

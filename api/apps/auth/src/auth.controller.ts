@@ -1,13 +1,16 @@
-import { Controller, Inject } from '@nestjs/common';
+import { Controller, Inject, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ClientProxy, MessagePattern } from '@nestjs/microservices';
 import { Observable } from 'rxjs';
+import { LoggerService } from '@app/libs/logger/logger.service';
+import { LocalAuthGuard } from '@app/libs/guards/local-auth.guards';
 
 @Controller()
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
     @Inject('USER_SERVICE') private readonly userService: ClientProxy,
+    private readonly logger: LoggerService,
   ) {}
 
   @MessagePattern({ cmd: 'hello-auth' })
@@ -25,12 +28,19 @@ export class AuthController {
     return this.authService.register(data);
   }
 
-  @MessagePattern({ cmd: 'authenticate' })
-  async authenticate(data: { username: string; password: string }): Promise<{
-    accessToken: string;
-    username: string;
-    userId: string;
-  }> {
-    return this.authService.authenticate(data);
+  @UseGuards(LocalAuthGuard)
+  @MessagePattern({ cmd: 'login' })
+  async login(data: { user: any }): Promise<any> {
+    const user = data.user;
+
+    const token = this.authService.generateToken(user);
+
+    return {
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+      },
+    };
   }
 }

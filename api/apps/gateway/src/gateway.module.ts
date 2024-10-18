@@ -17,8 +17,10 @@ import { AuthenticationController } from './controllers/authentication.controlle
       isGlobal: true,
       validationSchema: Joi.object({
         PORT: Joi.number().default(5000),
+        JWT_SECRET: Joi.string().required(),
+        DATABASE_URL: Joi.string().required(),
       }),
-      envFilePath: ['.env.local', '.env'],
+      envFilePath: ['env.local', '.env'],
     }),
     ClientsModule.register(microservicesConfig),
   ],

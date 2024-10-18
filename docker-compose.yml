@@ -20,8 +20,7 @@ services:
       target: development
     command: npm run start:dev:seed gateway
     env_file:
-      - ./api/apps/gateway/.env
-      - api/prisma/.env
+      - api/.env
     volumes:
       - ./api:/app
     container_name: gateway
@@ -40,7 +39,7 @@ services:
       target: development
     command: npm run start:dev user
     env_file:
-      - api/apps/user/.env
+      - api/.env
     volumes:
       - ./api:/app
     container_name: user
@@ -56,7 +55,7 @@ services:
       target: development
     command: npm run start:dev auth
     env_file:
-      - api/apps/auth/.env
+      - api/.env
     volumes:
       - ./api:/app
     container_name: auth
